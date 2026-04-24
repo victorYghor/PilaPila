@@ -2,20 +2,24 @@ import React, { createContext, useContext, useMemo, useReducer } from 'react';
 
 type RegistrationState = {
   name: string;
+  email: string;
 };
 
 type RegistrationAction =
   | { type: 'SET_NAME'; payload: string }
+  | { type: 'SET_EMAIL'; payload: string }
   | { type: 'RESET' };
 
 type RegistrationContextData = {
   state: RegistrationState;
   setName: (name: string) => void;
+  setEmail: (email: string) => void;
   resetRegistration: () => void;
 };
 
 const initialState: RegistrationState = {
   name: '',
+  email: '',
 };
 
 function registrationReducer(state: RegistrationState, action: RegistrationAction): RegistrationState {
@@ -24,6 +28,11 @@ function registrationReducer(state: RegistrationState, action: RegistrationActio
       return {
         ...state,
         name: action.payload,
+      };
+    case 'SET_EMAIL':
+      return {
+        ...state,
+        email: action.payload,
       };
     case 'RESET':
       return initialState;
@@ -42,6 +51,9 @@ export function RegistrationProvider({ children }: { children: React.ReactNode }
       state,
       setName: (name: string) => {
         dispatch({ type: 'SET_NAME', payload: name });
+      },
+      setEmail: (email: string) => {
+        dispatch({ type: 'SET_EMAIL', payload: email });
       },
       resetRegistration: () => {
         dispatch({ type: 'RESET' });

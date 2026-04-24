@@ -11,7 +11,7 @@ type ProgressBarProps = {
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
   width = '80%',
-  height = 20,
+  height = 16,
 }) => {
   const normalizedProgress = Math.max(0, Math.min(1, progress));
 

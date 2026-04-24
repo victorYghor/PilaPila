@@ -9,6 +9,7 @@ export default function AuthLayout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="register_name" options={{ headerShown: false }} />
+        <Stack.Screen name="register_email" options={{ headerShown: false }} />
       </Stack>
     </RegistrationProvider>
   );

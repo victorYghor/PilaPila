@@ -1,18 +1,17 @@
 import { Colors } from '@/constants/colors';
 import { FontSize } from '@/constants/metrics';
 import React from 'react';
-import { StyleSheet, Text, TextStyle, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface HyperLinkProps {
   label: string;
   onPress: () => void;
-  style?: TextStyle;
 }
 
-export const HyperLink: React.FC<HyperLinkProps> = ({ label, onPress, style }) => {
+export const HyperLink: React.FC<HyperLinkProps> = ({ label, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-      <Text style={[styles.link, style]}>{label}</Text>
+      <Text style={styles.link}>{label}</Text>
     </TouchableOpacity>
   );
 };

@@ -14,7 +14,8 @@ export const unstable_settings = {
 
 function AuthGate() {
   const { isAuthenticated } = useAuth();
-
+  console.log('isAuthenticated:', isAuthenticated);
+  
   return (
     <Stack>
       {isAuthenticated ? (

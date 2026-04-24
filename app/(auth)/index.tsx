@@ -1,73 +1,100 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, TextInput } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { useAuth } from '@/app/providers/AuthProvider';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Button } from '@/components/Buttons/Button';
+import { HyperLink } from '@/components/Hyperlinks/HyperLink';
+import { SubTitle } from '@/components/Texts/SubTitle';
+import { Title } from '@/components/Texts/Title';
+import { EmailInput } from '@/components/TextsInputs/EmailInput';
+import { PasswordInput } from '@/components/TextsInputs/PasswordInput';
+import { Colors } from '@/constants/colors';
+import { BorderRadius, CardPadding, FontSize, Spacing } from '@/constants/metrics';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
-  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   function handleLogin() {
-    signIn(name || 'Usuário PilaPila');
+    const userName = email.trim().split('@')[0] || 'Usuário PilaPila';
+    signIn(userName);
     router.replace('/');
   }
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        PilaPila
-      </ThemedText>
-      <ThemedText style={styles.subtitle}>Controle financeiro simples e rápido.</ThemedText>
+    <SafeAreaView  style={styles.safeArea}>
+      <ScrollView contentContainerStyle={[styles.container, { justifyContent: 'center' }]}>
+        <View style={styles.header}>
+          <Title text="Bem-vindo de volta" />
+          <SubTitle text="Entre para continuar" />
+        </View>
 
-      <TextInput
-        placeholder="Seu nome"
-        placeholderTextColor="#9BA1A6"
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-      />
+        <View style={styles.card}>
+          <EmailInput value={email} onChangeText={setEmail} />
+          <PasswordInput value={password} onChangeText={setPassword} />
 
-      <Pressable style={styles.button} onPress={handleLogin}>
-        <ThemedText type="defaultSemiBold" style={styles.buttonLabel}>
-          Entrar
-        </ThemedText>
-      </Pressable>
-    </ThemedView>
+          <View style={styles.forgotPasswordContainer}>
+          </View>
+
+          <Button label="Entrar" onPress={handleLogin} disabled={!email || !password} />
+
+          <View style={styles.registerRow}>
+            <Text style={styles.registerText}>Ainda não tem conta?</Text>
+            <HyperLink label="Cadastre-se" onPress={() => {}} />
+          </View>
+      </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
+    backgroundColor: Colors.primary400,
+  },
+  container: {
+  flexGrow: 1,
+  backgroundColor: Colors.primary400,
+  paddingHorizontal: Spacing.xl,
+  paddingVertical: Spacing.xl,
+  gap: Spacing.xxxl,
+},
+  header: {
+    gap: Spacing.xs,
+  },
+  card: {
+    backgroundColor: Colors.cardBackground,
+    borderRadius: BorderRadius.lg,
+    padding: CardPadding,
+    gap: Spacing.md,
+    shadowColor: Colors.shadowColor,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  forgotPasswordContainer: {
+    alignItems: 'flex-end',
+    marginTop: -Spacing.xs,
+  },
+  registerRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
-    padding: 24,
-    gap: 16,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  subtitle: {
-    textAlign: 'center',
-    opacity: 0.8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#687076',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: '#ECEDEE',
-  },
-  button: {
-    backgroundColor: '#0a7ea4',
-    borderRadius: 12,
-    paddingVertical: 12,
     alignItems: 'center',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
   },
-  buttonLabel: {
-    color: '#fff',
+  registerText: {
+    color: Colors.textGray,
+    fontSize: 18,
+    lineHeight: FontSize.sm * 1.4,
+  },
+  inlineLink: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.sm * 1.4,
   },
 });

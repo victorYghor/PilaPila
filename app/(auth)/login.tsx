@@ -43,7 +43,7 @@ export default function LoginScreen() {
 
           <View style={styles.registerRow}>
             <Text style={styles.registerText}>Ainda não tem conta?</Text>
-            <HyperLink label="Cadastre-se" onPress={() => router.push('/register_name')} />
+            <HyperLink label="Cadastre-se" onPress={() => router.push('/register')} />
           </View>
       </View>
       </ScrollView>

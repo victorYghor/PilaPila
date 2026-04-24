@@ -9,6 +9,7 @@ interface PasswordInputProps {
   onChangeText: (text: string) => void;
   label?: string;
   placeholder?: string;
+  onBlur?: () => void;
 }
 
 const EyeOpenIcon = () => (
@@ -44,6 +45,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   onChangeText,
   label = 'Senha',
   placeholder = 'Digite sua senha',
+  onBlur,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -60,6 +62,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           secureTextEntry={!isVisible}
           autoCapitalize="none"
           autoCorrect={false}
+          onBlur={onBlur}
         />
         <TouchableOpacity
           style={styles.eyeButton}

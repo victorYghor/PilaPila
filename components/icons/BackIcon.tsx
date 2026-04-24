@@ -9,7 +9,7 @@ type BackIconProps = {
 };
 
 export const BackIcon: React.FC<BackIconProps> = ({
-  size = FontSize.xl * 3,
+  size = FontSize.xl * 2,
   color = Colors.black,
 }) => {
   return (

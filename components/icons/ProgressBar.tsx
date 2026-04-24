@@ -10,8 +10,8 @@ type ProgressBarProps = {
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
-  width = '100%',
-  height = 4,
+  width = '80%',
+  height = 20,
 }) => {
   const normalizedProgress = Math.max(0, Math.min(1, progress));
 
@@ -28,7 +28,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       <View
         style={{
           width: `${normalizedProgress * 100}%`,
-          height: '100%',
+          height: height,
           backgroundColor: Colors.black,
           borderRadius: height / 2,
         }}

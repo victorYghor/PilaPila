@@ -55,7 +55,7 @@ function validatePassword(value: string): string | null {
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function RegisterScreen() {
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
   const [step, setStep] = useState<RegisterStep>(RegisterStep.Name);
 
   const [fullName, setFullName]               = useState('');
@@ -176,9 +176,15 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      signIn(fullName.trim());
-      router.replace('/');
-    } catch {
+      // Passando o objeto corretamente para a função de cadastro
+      await signUp({ 
+        email: email.trim(), 
+        password: password.trim(),
+        fullName: fullName.trim() // Passe o nome se o seu RegisterPayload aceitar
+      });
+      
+      // router.replace('/'); // Se o seu AuthContext já redireciona no onAuthStateChanged, talvez nem precise dessa linha
+    } catch (error) {
       setSubmitError('Erro ao finalizar cadastro. Tente novamente.');
     } finally {
       setLoading(false);
@@ -273,7 +279,7 @@ export default function RegisterScreen() {
 
           <View style={styles.loginRow}>
             <Text style={styles.loginText}>Já tem uma conta?</Text>
-            <HyperLink label="Faça login" onPress={() => router.replace('/')} />
+            <HyperLink label="Faça login" onPress={() => router.replace('/(protected)/')} />
           </View>
         </View>
       </ScrollView>

@@ -35,7 +35,7 @@ export default function ProtectedLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="home" />
-      <Stack.Screen name="profile" />
+      <Stack.Screen name="more" />
       <Stack.Screen
         name="transaction"
         options={{

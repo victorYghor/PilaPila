@@ -7,12 +7,12 @@
  */
 
 import { Colors } from '@/constants/colors';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AuthProvider, useAuth } from './providers/Authcontext';
 
 // Exported as the default Expo Router entry point.
 export default function RootLayout() {
@@ -48,7 +48,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       {/* Public auth screens */}
-      <Stack.Screen name="auth" />
+      <Stack.Screen name="(auth)" />
       {/* Protected screens — route guard lives inside (protected)/_layout.tsx */}
       <Stack.Screen name="(protected)" />
     </Stack>

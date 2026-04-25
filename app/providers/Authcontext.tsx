@@ -12,15 +12,8 @@
  */
 
 import { auth } from '@/config/firebase';
-import {
-  deleteAccount,
-  login,
-  logout,
-  mapFirebaseError,
-  register,
-  type LoginPayload,
-  type RegisterPayload,
-} from '@/services/authService';
+import { deleteAccount, login, LoginPayload, logout, mapFirebaseError, register, RegisterPayload } from '@/service/AuthService';
+
 import { onAuthStateChanged, type User } from 'firebase/auth';
 import React, {
   createContext,

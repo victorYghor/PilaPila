@@ -7,11 +7,11 @@
 
 import React, { useState } from 'react';
 import {
-    Alert,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -21,9 +21,9 @@ import { FontSize, Spacing } from '@/constants/metrics';
 // Replace these with your actual SVG icon components once you add them to assets/
 import { useAuth } from '@/app/providers/Authcontext';
 import { ConfirmDeleteModal } from '@/components/feedback/ConfirmDeleteModal';
-import { DeleteIcon } from '@/components/icons/DeleteIcon';
-import { LogoutIcon } from '@/components/icons/LogoutIcon';
-import { ProfileIcon } from '@/components/icons/ProfileIcon';
+import DeleteIcon from '@/components/icons/DeleteIcon';
+import LogoutIcon from '@/components/icons/LogoutIcon';
+import ProfileIcon from '@/components/icons/ProfileIcon';
 
 export default function ProfileScreen() {
   const { user, signOut, removeAccount, isSubmitting } = useAuth();

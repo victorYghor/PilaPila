@@ -17,6 +17,7 @@ export const EmailInput: React.FC<EmailInputProps> = ({
   label = 'E-mail',
   placeholder = 'Digite seu e-mail',
   onBlur,
+  ...props
 }) => {
   return (
     <View style={styles.wrapper}>
@@ -30,7 +31,8 @@ export const EmailInput: React.FC<EmailInputProps> = ({
         keyboardType="email-address"
         autoCapitalize="none"
         autoCorrect={false}
-        onBluer={onBlur}
+        onBlur={onBlur}
+        {...props}
       />
     </View>
   );

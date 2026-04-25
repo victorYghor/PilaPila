@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import React from 'react';
 import { Alert, Pressable, StyleSheet } from 'react-native';
 
-import { useAuth } from '@/app/providers/AuthProvider';
+import { useAuth } from '@/app/providers/Authcontext';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 

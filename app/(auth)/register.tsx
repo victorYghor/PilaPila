@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useAuth } from '@/app/providers/AuthProvider';
+import { useAuth } from '@/app/providers/Authcontext';
 import { Button } from '@/components/Buttons/Button';
 import { HyperLink } from '@/components/Hyperlinks/HyperLink';
 import { SubTitle } from '@/components/Texts/SubTitle';

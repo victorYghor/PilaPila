@@ -7,10 +7,10 @@
  * and it also serves as a friction layer so accidental taps don't destroy data.
  */
 
+import { useAuth } from '@/app/providers/Authcontext';
 import { PasswordInput } from '@/components/TextsInputs/PasswordInput';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, FontSize, Spacing } from '@/constants/metrics';
-import { useAuth } from '@/context/AuthContext';
 import React, { useState } from 'react';
 import {
     ActivityIndicator,

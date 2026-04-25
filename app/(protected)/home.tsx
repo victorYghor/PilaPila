@@ -60,7 +60,7 @@ export default function HomeScreen() {
             <Pressable
               key={item.id}
               style={styles.card}
-              onPress={() => router.push(`/(tabs)/transaction/${item.id}` as never)}>
+              onPress={() => router.push(`/(protected)/transaction/${item.id}` as never)}>
               <ThemedText type="defaultSemiBold">{item.title}</ThemedText>
               <ThemedText>R$ {item.amount.toFixed(2)}</ThemedText>
             </Pressable>

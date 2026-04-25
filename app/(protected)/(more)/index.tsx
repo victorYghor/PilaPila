@@ -11,7 +11,7 @@ export default function MoreScreen() {
       <ThemedText type="title">Mais</ThemedText>
       <ThemedText>Acesse as opções da sua conta.</ThemedText>
 
-      <Pressable style={styles.button} onPress={() => router.push('/(tabs)/profile' as never)}>
+      <Pressable style={styles.button} onPress={() => router.push('/(tabs)/(more)/profile' as never)}>
         <ThemedText type="defaultSemiBold" style={styles.buttonLabel}>
           Perfil
         </ThemedText>

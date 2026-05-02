@@ -1,22 +1,19 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { useAuth } from '@/app/providers/Authcontext';
-import { Button } from '@/components/Buttons/Button';
 import { HyperLink } from '@/components/Hyperlinks/HyperLink';
 import { InlineLink } from '@/components/Hyperlinks/InlineLink';
 import { PasswordRules } from '@/components/Texts/PasswordRules';
-import { SubTitle } from '@/components/Texts/SubTitle';
-import { Title } from '@/components/Texts/Title';
 import { EmailInput } from '@/components/TextsInputs/EmailInput';
 import { NameInput } from '@/components/TextsInputs/NameInput';
 import { PasswordInput } from '@/components/TextsInputs/PasswordInput';
-import { BackIcon } from '@/components/icons/BackIcon';
-import { ProgressBar } from '@/components/icons/ProgressBar';
+// header/back/progress are rendered by AuthTemplate
+import { Button } from '@/components/Buttons/Button';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, CardPadding, FontSize, Spacing } from '@/constants/metrics';
+import { AuthTemplate } from '@/templates/AuthTemplate';
 
 // ─── Steps ───────────────────────────────────────────────────────────────────
 
@@ -118,7 +115,7 @@ export default function RegisterScreen() {
     [RegisterStep.ConfirmTermsAndConditions]: {
       subtitle: "Quase lá! Aceite os termos para finalizar seu cadastro.",
       onNext: async () => {
-            await handleCreateAccount();
+        await handleCreateAccount();
       },
       isButtonDisabled: false,
     },
@@ -127,7 +124,7 @@ export default function RegisterScreen() {
   const stepsMap = getSteps();
   const stepsQuantity = Object.keys(stepsMap).length;
   const progress = step / stepsQuantity;
-  const subtitle = stepsMap[step].subtitle;
+  // subtitle is provided to AuthTemplate directly
   const isPasswordStep = step === RegisterStep.Password;
 
   const isButtonDisabled = stepsMap[step].isButtonDisabled;
@@ -160,7 +157,7 @@ export default function RegisterScreen() {
   }
 
   async function handleCreateAccount() {
-    
+
     setLoading(true);
     try {
       // Passando o objeto corretamente para a função de cadastro
@@ -238,52 +235,42 @@ export default function RegisterScreen() {
           </InlineLink>
         </Text>
       );
+    }
   }
-  }
+  // Footer component to be rendered by AuthTemplate
+  const Footer: React.FC = () => (
+    <View style={styles.loginRow}>
+      <Text style={styles.loginText}>Já tem uma conta?</Text>
+      <HyperLink onPress={() => router.replace('/login')}> {"Faça login"}</HyperLink>
+    </View>
+  );
+
+  // Confirm button as a component so AuthTemplate can render it
+  const ConfirmButton: React.FC = () => (
+    <Button
+      label={isPasswordStep ? 'Criar conta' : 'Continuar'}
+      onPress={() => {
+        const cur = stepsMap[step];
+        void cur.onNext();
+      }}
+      disabled={isButtonDisabled}
+      loading={loading}
+    />
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      >
-        <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.7}>
-          <BackIcon />
-        </TouchableOpacity>
-
-        <View style={styles.header}>
-          <Title text="Crie sua conta" />
-          <SubTitle text={subtitle} />
-          <View style={styles.progressWrapper}>
-            <ProgressBar progress={progress} />
-          </View>
-        </View>
-
-        <View style={styles.card}>
-          {BoxContent(step)}
-          
-          {/* Submit-level error */}
-          {submitError ? (
-            <Text style={styles.submitError}>{submitError}</Text>
-          ) : null}
-
-          <Button
-            label={isPasswordStep ? 'Criar conta' : 'Continuar'}
-            onPress={() => {
-              // call the current step's onNext which handles validation and navigation
-              const cur = stepsMap[step];
-              void cur.onNext();
-            }}
-            disabled={isButtonDisabled}
-            loading={loading}
-          />
-
-          <View style={styles.loginRow}>
-            <Text style={styles.loginText}>Já tem uma conta?</Text>
-            <HyperLink onPress={() => router.replace('/login')}> {"Faça login"}</HyperLink>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <AuthTemplate
+      title={"Crie sua conta"}
+      subtitle={stepsMap[step].subtitle}
+      progress={progress}
+      boxContent={(s) => BoxContent(s as RegisterStep)}
+      step={step}
+      submitError={submitError}
+      loading={loading}
+      Footer={Footer}
+      ConfirmButton={ConfirmButton}
+      onBack={handleBack}
+    />
   );
 }
 
@@ -291,7 +278,8 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   text: {
-    fontSize: FontSize.lg  },
+    fontSize: FontSize.lg
+  },
   safeArea: {
     flex: 1,
     backgroundColor: Colors.primary400,

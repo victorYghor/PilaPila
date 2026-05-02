@@ -91,8 +91,12 @@ export default function LoginScreen() {
               />
             </View>
 
-            {/* Firebase-level error (wrong password, user not found, etc.) */}
+              {/* Firebase-level error (wrong password, user not found, etc.) */}
             {error ? <Text style={styles.globalError}>{error}</Text> : null}
+
+              <View style={{ alignItems: 'flex-end', marginTop: -Spacing.sm }}>
+                <HyperLink onPress={() => router.push({ pathname: '/(auth)/reset-password' } as any)}>Esqueceu a senha?</HyperLink>
+              </View>
 
             <Button
               label="Entrar"

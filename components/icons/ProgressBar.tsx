@@ -29,7 +29,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         style={{
           width: `${normalizedProgress * 100}%`,
           height: height,
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.textGray,
           borderRadius: height / 2,
         }}
       />

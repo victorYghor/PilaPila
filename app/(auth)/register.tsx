@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/app/providers/Authcontext';
 import { Button } from '@/components/Buttons/Button';
 import { HyperLink } from '@/components/Hyperlinks/HyperLink';
+import { PasswordRules } from '@/components/Texts/PasswordRules';
 import { SubTitle } from '@/components/Texts/SubTitle';
 import { Title } from '@/components/Texts/Title';
 import { EmailInput } from '@/components/TextsInputs/EmailInput';
@@ -22,12 +23,14 @@ enum RegisterStep {
   Name = 1,
   Email = 2,
   Password = 3,
+  ConfirmTermsAndConditions = 4,
 }
 
 const STEP_SUBTITLES: Record<RegisterStep, string> = {
-  [RegisterStep.Name]:     'Qual o seu nome?',
-  [RegisterStep.Email]:    'Qual o seu e-mail?',
+  [RegisterStep.Name]: 'Qual o seu nome?',
+  [RegisterStep.Email]: 'Qual o seu e-mail?',
   [RegisterStep.Password]: 'Crie e confirme sua senha',
+  [RegisterStep.ConfirmTermsAndConditions]: "Quase lá! Aceite os termos para finalizar seu cadastro.",
 };
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
@@ -58,30 +61,30 @@ export default function RegisterScreen() {
   const { signUp } = useAuth();
   const [step, setStep] = useState<RegisterStep>(RegisterStep.Name);
 
-  const [fullName, setFullName]               = useState('');
-  const [email, setEmail]                     = useState('');
-  const [password, setPassword]               = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
   // Inline error messages shown below each field
-  const [emailError, setEmailError]       = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [confirmError, setConfirmError]   = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
 
   // ── Derived state ────────────────────────────────────────────
-
-  const progress       = step / 3;
-  const subtitle       = STEP_SUBTITLES[step];
-  const isNameStep     = step === RegisterStep.Name;
-  const isEmailStep    = step === RegisterStep.Email;
+  const stepsQuantity = Object.keys(STEP_SUBTITLES).length;
+  const progress = step / stepsQuantity;
+  const subtitle = STEP_SUBTITLES[step];
+  const isNameStep = step === RegisterStep.Name;
+  const isEmailStep = step === RegisterStep.Email;
   const isPasswordStep = step === RegisterStep.Password;
 
   const isButtonDisabled = useMemo(() => {
-    if (isNameStep)     return !fullName.trim();
-    if (isEmailStep)    return !email.trim();
+    if (isNameStep) return !fullName.trim();
+    if (isEmailStep) return !email.trim();
     return (
       !password.trim() ||
       !confirmPassword.trim() ||
@@ -177,12 +180,12 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       // Passando o objeto corretamente para a função de cadastro
-      await signUp({ 
-        email: email.trim(), 
+      await signUp({
+        email: email.trim(),
         password: password.trim(),
         fullName: fullName.trim() // Passe o nome se o seu RegisterPayload aceitar
       });
-      
+
       // router.replace('/'); // Se o seu AuthContext já redireciona no onAuthStateChanged, talvez nem precise dessa linha
     } catch (error) {
       setSubmitError('Erro ao finalizar cadastro. Tente novamente.');
@@ -261,7 +264,7 @@ export default function RegisterScreen() {
                 ) : null}
               </View>
 
-              <PasswordRules password={password} />
+              <PasswordRules password={password} minPasswordLength={MIN_PASSWORD_LENGTH}/>
             </>
           )}
 
@@ -279,34 +282,11 @@ export default function RegisterScreen() {
 
           <View style={styles.loginRow}>
             <Text style={styles.loginText}>Já tem uma conta?</Text>
-            <HyperLink label="Faça login" onPress={() => router.replace('/(protected)/')} />
+            <HyperLink label="Faça login" onPress={() => router.replace('/login')} />
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-// ─── Password strength hint ───────────────────────────────────────────────────
-
-function PasswordRules({ password }: { password: string }) {
-  const rules: { label: string; ok: boolean }[] = [
-    { label: 'Mínimo 8 caracteres',     ok: password.length >= MIN_PASSWORD_LENGTH },
-    { label: 'Uma letra maiúscula',      ok: /[A-Z]/.test(password) },
-    { label: 'Um número',               ok: /[0-9]/.test(password) },
-  ];
-
-  return (
-    <View style={styles.rulesWrapper}>
-      {rules.map(r => (
-        <Text
-          key={r.label}
-          style={[styles.ruleText, r.ok ? styles.ruleOk : styles.rulePending]}
-        >
-          {r.ok ? '✓' : '○'} {r.label}
-        </Text>
-      ))}
-    </View>
   );
 }
 
@@ -372,19 +352,5 @@ const styles = StyleSheet.create({
     color: Colors.expenseRed,
     fontSize: FontSize.sm,
     textAlign: 'center',
-  },
-  rulesWrapper: {
-    gap: 4,
-    marginTop: -Spacing.xs,
-  },
-  ruleText: {
-    fontSize: FontSize.xs,
-    lineHeight: FontSize.xs * 1.6,
-  },
-  ruleOk: {
-    color: Colors.incomeGreen,
-  },
-  rulePending: {
-    color: Colors.textGray,
   },
 });

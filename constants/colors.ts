@@ -16,6 +16,7 @@ export const Colors = {
   textGray: '#7A8A99',           // Gray — placeholder, disabled text
   textWhite: '#FFFFFF',          // Pure white — text on solid buttons
 
+  darkGreen: '#2c4c3b',
   // ─── Semantic / Finance ──────────────────────────────────────
   incomeGreen: '#2FBF71',        // Green  — receitas (income)
   expenseRed: '#E45858',         // Red    — despesas (expenses)

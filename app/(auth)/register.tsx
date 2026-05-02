@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/app/providers/Authcontext';
 import { Button } from '@/components/Buttons/Button';
 import { HyperLink } from '@/components/Hyperlinks/HyperLink';
+import { InlineLink } from '@/components/Hyperlinks/InlineLink';
 import { PasswordRules } from '@/components/Texts/PasswordRules';
 import { SubTitle } from '@/components/Texts/SubTitle';
 import { Title } from '@/components/Texts/Title';
@@ -26,12 +27,11 @@ enum RegisterStep {
   ConfirmTermsAndConditions = 4,
 }
 
-const STEP_SUBTITLES: Record<RegisterStep, string> = {
-  [RegisterStep.Name]: 'Qual o seu nome?',
-  [RegisterStep.Email]: 'Qual o seu e-mail?',
-  [RegisterStep.Password]: 'Crie e confirme sua senha',
-  [RegisterStep.ConfirmTermsAndConditions]: "Quase lá! Aceite os termos para finalizar seu cadastro.",
-};
+interface StepState {
+  subtitle: string;
+  onNext: () => void | Promise<void>;
+  isButtonDisabled: boolean;
+}
 
 // ─── Validation helpers ───────────────────────────────────────────────────────
 
@@ -56,7 +56,6 @@ function validatePassword(value: string): string | null {
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
-
 export default function RegisterScreen() {
   const { signUp } = useAuth();
   const [step, setStep] = useState<RegisterStep>(RegisterStep.Name);
@@ -74,24 +73,64 @@ export default function RegisterScreen() {
 
   const [loading, setLoading] = useState(false);
 
-  // ── Derived state ────────────────────────────────────────────
-  const stepsQuantity = Object.keys(STEP_SUBTITLES).length;
+  const getSteps = (): Record<RegisterStep, StepState> => ({
+    [RegisterStep.Name]: {
+      subtitle: 'Qual o seu nome?',
+      onNext: () => {
+        // Just advance to next step; validation happens on create
+        setStep(prev => (prev + 1) as RegisterStep);
+      },
+      isButtonDisabled: !fullName.trim(),
+    },
+    [RegisterStep.Email]: {
+      subtitle: 'Qual o seu e-mail?',
+      onNext: () => {
+        // validate email inline before moving on
+        const err = validateEmail(email);
+        if (err) {
+          setEmailError(err);
+          return;
+        }
+        setEmail(prev => prev.trim());
+        setStep(prev => (prev + 1) as RegisterStep);
+      },
+      isButtonDisabled: !email.trim(),
+    },
+    [RegisterStep.Password]: {
+      subtitle: 'Crie e confirme sua senha',
+      onNext: async () => {
+        const pwErr = validatePassword(password);
+        if (pwErr) { setPasswordError(pwErr); return; }
+        if (password.trim() !== confirmPassword.trim()) {
+          setConfirmError('As senhas precisam ser iguais.');
+          return;
+        }
+        // Move to confirm step and create account
+        setStep(prev => (prev + 1) as RegisterStep);
+      },
+      isButtonDisabled: (
+        !password.trim() ||
+        !confirmPassword.trim() ||
+        password.trim() !== confirmPassword.trim() ||
+        !!validatePassword(password)
+      ),
+    },
+    [RegisterStep.ConfirmTermsAndConditions]: {
+      subtitle: "Quase lá! Aceite os termos para finalizar seu cadastro.",
+      onNext: async () => {
+            await handleCreateAccount();
+      },
+      isButtonDisabled: false,
+    },
+  });
+
+  const stepsMap = getSteps();
+  const stepsQuantity = Object.keys(stepsMap).length;
   const progress = step / stepsQuantity;
-  const subtitle = STEP_SUBTITLES[step];
-  const isNameStep = step === RegisterStep.Name;
-  const isEmailStep = step === RegisterStep.Email;
+  const subtitle = stepsMap[step].subtitle;
   const isPasswordStep = step === RegisterStep.Password;
 
-  const isButtonDisabled = useMemo(() => {
-    if (isNameStep) return !fullName.trim();
-    if (isEmailStep) return !email.trim();
-    return (
-      !password.trim() ||
-      !confirmPassword.trim() ||
-      password.trim() !== confirmPassword.trim() ||
-      !!validatePassword(password)
-    );
-  }, [step, fullName, email, password, confirmPassword, isNameStep, isEmailStep]);
+  const isButtonDisabled = stepsMap[step].isButtonDisabled;
 
   // ── Handlers ─────────────────────────────────────────────────
 
@@ -120,63 +159,8 @@ export default function RegisterScreen() {
     }
   }
 
-  async function handleNext() {
-    setSubmitError(null);
-
-    // Step 1 → 2
-    if (isNameStep) {
-      setFullName(prev => prev.trim());
-      setStep(RegisterStep.Email);
-      return;
-    }
-
-    // Step 2 → 3 (validate e-mail before advancing)
-    if (isEmailStep) {
-      const err = validateEmail(email);
-      if (err) { setEmailError(err); return; }
-      setEmail(prev => prev.trim());
-      setStep(RegisterStep.Password);
-      return;
-    }
-
-    // Step 3 → create account
-    const pwErr = validatePassword(password);
-    if (pwErr) { setPasswordError(pwErr); return; }
-    if (password.trim() !== confirmPassword.trim()) {
-      setConfirmError('As senhas precisam ser iguais.');
-      return;
-    }
-
-    await handleCreateAccount();
-  }
-
   async function handleCreateAccount() {
-    if (!fullName.trim()) {
-      setStep(RegisterStep.Name);
-      setSubmitError('Informe seu nome para continuar.');
-      return;
-    }
-
-    const emailValidation = validateEmail(email);
-    if (emailValidation) {
-      setEmailError(emailValidation);
-      setStep(RegisterStep.Email);
-      return;
-    }
-
-    const passwordValidation = validatePassword(password);
-    if (passwordValidation) {
-      setPasswordError(passwordValidation);
-      setStep(RegisterStep.Password);
-      return;
-    }
-
-    if (password.trim() !== confirmPassword.trim()) {
-      setConfirmError('As senhas precisam ser iguais.');
-      setStep(RegisterStep.Password);
-      return;
-    }
-
+    
     setLoading(true);
     try {
       // Passando o objeto corretamente para a função de cadastro
@@ -187,15 +171,75 @@ export default function RegisterScreen() {
       });
 
       // router.replace('/'); // Se o seu AuthContext já redireciona no onAuthStateChanged, talvez nem precise dessa linha
-    } catch (error) {
-      setSubmitError('Erro ao finalizar cadastro. Tente novamente.');
+    } catch (error: any) {
+      // include a short debug hint when available
+      const msg = (error && error.message) ? `: ${error.message}` : '';
+      setSubmitError(`Erro ao finalizar cadastro. Tente novamente${msg}`);
     } finally {
       setLoading(false);
     }
   }
 
   // ── Render ────────────────────────────────────────────────────
+  function BoxContent(step: RegisterStep): React.ReactElement | undefined {
+    switch (step) {
+      case RegisterStep.Name: return (<NameInput value={fullName} onChangeText={setFullName} />);
+      case RegisterStep.Email: return (
+        <View>
+          <EmailInput
+            value={email}
+            onChangeText={v => { setEmail(v); setEmailError(null); }}
+            placeholder="E-mail"
+            onBlur={handleEmailBlur}
+          />
+          {emailError ? (
+            <Text style={styles.fieldError}>{emailError}</Text>
+          ) : null}
+        </View>
+      );
+      case RegisterStep.Password: return (<>
+        <View>
+          <PasswordInput
+            value={password}
+            onChangeText={v => { setPassword(v); setPasswordError(null); }}
+            label="Senha"
+            placeholder="Mínimo 8 caracteres"
+            onBlur={handlePasswordBlur}
+          />
+          {passwordError ? (
+            <Text style={styles.fieldError}>{passwordError}</Text>
+          ) : null}
+        </View>
 
+        <View>
+          <PasswordInput
+            value={confirmPassword}
+            onChangeText={v => { setConfirmPassword(v); setConfirmError(null); }}
+            label="Confirme sua senha"
+            placeholder="Repita a senha"
+            onBlur={handleConfirmBlur}
+          />
+          {confirmError ? (
+            <Text style={styles.fieldError}>{confirmError}</Text>
+          ) : null}
+        </View>
+
+        <PasswordRules password={password} minPasswordLength={MIN_PASSWORD_LENGTH} />
+      </>);
+      case RegisterStep.ConfirmTermsAndConditions: return (
+        <Text style={styles.text}>
+          Ao criar sua conta, você concorda com nossos {' '}
+          <InlineLink onPress={() => { /* abrir termos */ }} accessibilityLabel="Termos de Serviço">
+            Termos de Serviço
+          </InlineLink>
+          {' '}e{' '}
+          <InlineLink onPress={() => { /* abrir política */ }} accessibilityLabel="Política de Privacidade">
+            Política de Privacidade
+          </InlineLink>
+        </Text>
+      );
+  }
+  }
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -215,59 +259,8 @@ export default function RegisterScreen() {
         </View>
 
         <View style={styles.card}>
-          {/* ── Step 1: Name ── */}
-          {isNameStep && (
-            <NameInput value={fullName} onChangeText={setFullName} />
-          )}
-
-          {/* ── Step 2: Email ── */}
-          {isEmailStep && (
-            <View>
-              <EmailInput
-                value={email}
-                onChangeText={v => { setEmail(v); setEmailError(null); }}
-                placeholder="E-mail"
-                onBlur={handleEmailBlur}
-              />
-              {emailError ? (
-                <Text style={styles.fieldError}>{emailError}</Text>
-              ) : null}
-            </View>
-          )}
-
-          {/* ── Step 3: Password ── */}
-          {isPasswordStep && (
-            <>
-              <View>
-                <PasswordInput
-                  value={password}
-                  onChangeText={v => { setPassword(v); setPasswordError(null); }}
-                  label="Senha"
-                  placeholder="Mínimo 8 caracteres"
-                  onBlur={handlePasswordBlur}
-                />
-                {passwordError ? (
-                  <Text style={styles.fieldError}>{passwordError}</Text>
-                ) : null}
-              </View>
-
-              <View>
-                <PasswordInput
-                  value={confirmPassword}
-                  onChangeText={v => { setConfirmPassword(v); setConfirmError(null); }}
-                  label="Confirme sua senha"
-                  placeholder="Repita a senha"
-                  onBlur={handleConfirmBlur}
-                />
-                {confirmError ? (
-                  <Text style={styles.fieldError}>{confirmError}</Text>
-                ) : null}
-              </View>
-
-              <PasswordRules password={password} minPasswordLength={MIN_PASSWORD_LENGTH}/>
-            </>
-          )}
-
+          {BoxContent(step)}
+          
           {/* Submit-level error */}
           {submitError ? (
             <Text style={styles.submitError}>{submitError}</Text>
@@ -275,14 +268,18 @@ export default function RegisterScreen() {
 
           <Button
             label={isPasswordStep ? 'Criar conta' : 'Continuar'}
-            onPress={handleNext}
+            onPress={() => {
+              // call the current step's onNext which handles validation and navigation
+              const cur = stepsMap[step];
+              void cur.onNext();
+            }}
             disabled={isButtonDisabled}
             loading={loading}
           />
 
           <View style={styles.loginRow}>
             <Text style={styles.loginText}>Já tem uma conta?</Text>
-            <HyperLink label="Faça login" onPress={() => router.replace('/login')} />
+            <HyperLink onPress={() => router.replace('/login')}> {"Faça login"}</HyperLink>
           </View>
         </View>
       </ScrollView>
@@ -293,6 +290,8 @@ export default function RegisterScreen() {
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
+  text: {
+    fontSize: FontSize.lg  },
   safeArea: {
     flex: 1,
     backgroundColor: Colors.primary400,

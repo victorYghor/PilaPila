@@ -1,28 +1,63 @@
 import { Colors } from '@/constants/colors';
 import { FontSize } from '@/constants/metrics';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { GestureResponderEvent, Pressable, StyleSheet, Text } from 'react-native';
 
 interface HyperLinkProps {
-  label: string;
-  onPress: () => void;
+  children: React.ReactNode;
+  onPress?: (event: GestureResponderEvent) => void | Promise<void>;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  testID?: string;
+  // optional style override
+  style?: any;
 }
 
-export const HyperLink: React.FC<HyperLinkProps> = ({ label, onPress }) => {
+/**
+ * HyperLink
+ * - Blue color, underlined
+ * - Uses accessibilityRole='link' so screen readers announce it as a link
+ * - Pressable so it supports touch, keyboard and accessibility activation
+ */
+export const HyperLink: React.FC<HyperLinkProps> = ({
+  children,
+  onPress,
+  accessibilityLabel,
+  accessibilityHint,
+  testID,
+  style,
+}) => {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
-      <Text style={styles.link}>{label}</Text>
-    </TouchableOpacity>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="link"
+      accessible
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      android_ripple={{ color: 'rgba(0,0,0,0.04)' }}
+      testID={testID}
+      style={({ pressed }) => [style, styles.container, pressed && styles.pressed]}
+    >
+      <Text style={styles.link}>{children}</Text>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   link: {
     color: Colors.primary700,
-    fontSize: FontSize.lg,
+    fontSize: FontSize.md,
     fontWeight: '500',
-    lineHeight: FontSize.lg * 1.4,
+    lineHeight: FontSize.md,
     textAlign: 'center',
     textDecorationLine: 'underline',
+  },
+  container: {
+    height: FontSize.md,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  pressed: {
+    opacity: 0.75,
   },
 });

@@ -7,7 +7,7 @@ import { TextInput } from "react-native";
 import { useAuth } from "../providers/Authcontext";
 
 
-export function VerifyCodeScreen() {
+export default function VerifyCodeScreen() {
     const [code, setCode] = React.useState("");
     const [error, setError] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);

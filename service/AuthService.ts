@@ -9,15 +9,17 @@
 
 import { auth } from '@/config/firebase';
 import {
-    createUserWithEmailAndPassword,
-    deleteUser,
-    EmailAuthProvider,
-    reauthenticateWithCredential,
-    sendPasswordResetEmail,
-    signInWithEmailAndPassword,
-    signOut,
-    updateProfile,
-    type User,
+  confirmPasswordReset,
+  createUserWithEmailAndPassword,
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+  verifyPasswordResetCode,
+  type User,
 } from 'firebase/auth';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -106,6 +108,14 @@ export async function logout(): Promise<void> {
  */
 export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email.trim());
+}
+
+export async function setNewPassowrd(code: string, newPassword: string): Promise<void> {
+  await confirmPasswordReset(auth, code, newPassword.trim());
+}
+
+export async function verifycode(code: string): Promise<string> {
+  return await verifyPasswordResetCode(auth, code);
 }
 
 /**

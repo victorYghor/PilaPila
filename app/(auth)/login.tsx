@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Button } from '@/components/Buttons/Button';
+import { PilaPilaButton } from '@/components/Buttons/Button';
 import { HyperLink } from '@/components/Hyperlinks/HyperLink';
 import { SubTitle } from '@/components/Texts/SubTitle';
 import { Title } from '@/components/Texts/Title';
@@ -25,9 +25,9 @@ import { EmailInput } from '@/components/TextsInputs/EmailInput';
 import { PasswordInput } from '@/components/TextsInputs/PasswordInput';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, CardPadding, FontSize, Spacing } from '@/constants/metrics';
+import { EMAIL_REGEX } from '@/constants/regex';
 import { useAuth } from '../providers/Authcontext';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export default function LoginScreen() {
   const { signIn, isSubmitting, error, clearError } = useAuth();
@@ -95,10 +95,10 @@ export default function LoginScreen() {
             {error ? <Text style={styles.globalError}>{error}</Text> : null}
 
               <View style={{ alignItems: 'flex-end', marginTop: -Spacing.sm }}>
-                <HyperLink onPress={() => router.push({ pathname: '/(auth)/reset-password' } as any)}>Esqueceu a senha?</HyperLink>
+                <HyperLink onPress={() => router.push({ pathname: '/(auth)/email_to_reset_password' } as any)}>Esqueceu a senha?</HyperLink>
               </View>
 
-            <Button
+            <PilaPilaButton
               label="Entrar"
               onPress={handleLogin}
               disabled={isDisabled}

@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useAuth } from '@/app/providers/Authcontext';
@@ -10,9 +10,10 @@ import { EmailInput } from '@/components/TextsInputs/EmailInput';
 import { NameInput } from '@/components/TextsInputs/NameInput';
 import { PasswordInput } from '@/components/TextsInputs/PasswordInput';
 // header/back/progress are rendered by AuthTemplate
-import { Button } from '@/components/Buttons/Button';
+import { PilaPilaButton } from '@/components/Buttons/Button';
 import { Colors } from '@/constants/colors';
 import { BorderRadius, CardPadding, FontSize, Spacing } from '@/constants/metrics';
+import { EMAIL_REGEX } from '@/constants/regex';
 import { AuthTemplate } from '@/templates/AuthTemplate';
 
 // ─── Steps ───────────────────────────────────────────────────────────────────
@@ -34,8 +35,6 @@ interface StepState {
 
 const MIN_PASSWORD_LENGTH = 8;
 
-/** RFC-5322 simplified — catches the vast majority of invalid addresses */
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function validateEmail(value: string): string | null {
   if (!value.trim()) return 'O e-mail é obrigatório.';
@@ -246,8 +245,8 @@ export default function RegisterScreen() {
   );
 
   // Confirm button as a component so AuthTemplate can render it
-  const ConfirmButton: React.FC = () => (
-    <Button
+  const ConfirmButton: ReactElement = (
+    <PilaPilaButton
       label={isPasswordStep ? 'Criar conta' : 'Continuar'}
       onPress={() => {
         const cur = stepsMap[step];
@@ -263,8 +262,7 @@ export default function RegisterScreen() {
       title={"Crie sua conta"}
       subtitle={stepsMap[step].subtitle}
       progress={progress}
-      boxContent={(s) => BoxContent(s as RegisterStep)}
-      step={step}
+      boxContent={() => BoxContent(step as RegisterStep)}
       submitError={submitError}
       loading={loading}
       Footer={Footer}

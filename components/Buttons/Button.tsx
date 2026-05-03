@@ -3,14 +3,14 @@ import { ButtonHeight, FontSize } from '@/constants/metrics';
 import React from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-interface ButtonProps {
+interface PiplaPilaButtonProps {
   label: string;
   onPress: () => void;
   loading?: boolean;
   disabled?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export const PilaPilaButton: React.FC<PiplaPilaButtonProps> = ({
   label,
   onPress,
   loading = false,

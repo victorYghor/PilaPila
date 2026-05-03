@@ -1,7 +1,5 @@
-import { Colors } from '@/constants/colors';
-import { BorderRadius, FontSize, InputHeight, Spacing } from '@/constants/metrics';
 import React from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { PilaPilaInput } from './PilaPilaInput';
 
 interface NameInputProps {
   value: string;
@@ -17,42 +15,14 @@ export const NameInput: React.FC<NameInputProps> = ({
   placeholder = 'Seu nome',
 }) => {
   return (
-    <View style={styles.wrapper}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={styles.input}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={Colors.textGray}
-        keyboardType="default"
-        autoCapitalize="words"
-        autoCorrect={false}
-      />
-    </View>
+    <PilaPilaInput
+      value={value}
+      onChangeText={onChangeText}
+      label={label}
+      placeholder={placeholder}
+      keyboardType="default"
+      autoCapitalize="words"
+      autoCorrect={false}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  wrapper: {
-    width: '100%',
-    gap: Spacing.sm,
-  },
-  label: {
-    color: Colors.primary700,
-    fontSize: FontSize.sm,
-    fontWeight: '500',
-    lineHeight: FontSize.sm * 1.5,
-  },
-  input: {
-    height: InputHeight,
-    backgroundColor: Colors.inputBackground,
-    borderWidth: 1.84,
-    borderColor: Colors.borderDefault,
-    borderRadius: BorderRadius.md,
-    paddingHorizontal: Spacing.md,
-    fontSize: FontSize.md,
-    fontWeight: '400',
-    color: Colors.black,
-  },
-});

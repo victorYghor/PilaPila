@@ -60,6 +60,10 @@ interface AuthContextValue {
    * @param currentPassword - required for Firebase re-authentication.
    */
   removeAccount: (currentPassword: string) => Promise<void>;
+  verifyCode: string | null;
+  setVerifyCode: (code: string | null) => void;
+  emailOfReset: string | null;
+  setEmailOfReset: (email: string | null) => void;
 }
 
 // ─── Context creation ─────────────────────────────────────────────────────────
@@ -73,6 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading]   = useState(true);  // true until first Firebase response
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError]           = useState<string | null>(null);
+  const [verifyCode, setVerifyCode] = useState<string | null>(null);
+  const [emailOfReset, setEmailOfReset] = useState<string | null>(null);
 
   // Subscribe to Firebase auth state changes when the provider mounts.
   // The unsubscribe function returned by onAuthStateChanged is called on
@@ -125,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [run],
   );
 
+
   const value: AuthContextValue = {
     user,
     isLoading,
@@ -135,6 +142,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signUp,
     signOut: handleSignOut,
     removeAccount,
+    verifyCode,
+    setVerifyCode,
+    emailOfReset,
+    setEmailOfReset
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
